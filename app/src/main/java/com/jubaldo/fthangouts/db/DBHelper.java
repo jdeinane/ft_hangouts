@@ -1,8 +1,16 @@
 package com.jubaldo.fthangouts.db;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.jubaldo.fthangouts.model.Contact;
+import com.jubaldo.fthangouts.model.Message;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /*
     Class that handles ft_hangout's SQLite database.
@@ -85,5 +93,151 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
         onCreate(db);
+    }
+
+    /*
+        CRUD methods implementations for contacts:
+            - create contact
+            - read contact
+            - update contact
+            - delete contact
+    */
+    public long insertContact(Contact contact) {
+        // getWritableDatabase(): request a write connection to the DB from SQLiteOpenHelper
+        // Android checks if the .db file exists - else, automatically calls onCreate()
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // ContentValues(): key-value structure - associates a column name to a value.
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_FIRST_NAME, contact.getFirstName());
+        values.put(COLUMN_LAST_NAME, contact.getLastName());
+        values.put(COLUMN_PHONE_NUMBER, contact.getPhoneNumber());
+        values.put(COLUMN_EMAIL, contact.getEmail());
+        values.put(COLUMN_BIRTHDAY, contact.getBirthday());
+
+        // db.insert(...): inserts a new line.
+        long newId = db.insert(TABLE_CONTACTS, null, values);
+
+        // db.close(): close the connection to the DB when the operation is finished.
+        db.close();
+        return newId;
+    }
+
+    public List<Contact> getAllContacts() {
+        List<Contact> contacts = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Cursor: result send by db.query(...), but not in a 'list' way.
+        // It's an iterator that moves line by line in the result: it designates a position, not the whole content.
+        Cursor cursor = db.query(
+                TABLE_CONTACTS,
+                null,
+                null,
+                null,
+                null,
+                null,
+                COLUMN_LAST_NAME + " ASC"
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                Contact contact = new Contact(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE_NUMBER)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BIRTHDAY))
+                );
+                contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CONTACT_ID)));
+                contacts.add(contact);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return contacts;
+    }
+
+    public int updateContact(Contact contact) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_FIRST_NAME, contact.getFirstName());
+        values.put(COLUMN_LAST_NAME, contact.getLastName());
+        values.put(COLUMN_PHONE_NUMBER, contact.getPhoneNumber());
+        values.put(COLUMN_EMAIL, contact.getEmail());
+        values.put(COLUMN_BIRTHDAY, contact.getBirthday());
+
+        int rowsAffected = db.update(
+                TABLE_CONTACTS,
+                values,
+                COLUMN_CONTACT_ID + " = ?",
+                new String[]{String.valueOf(contact.getId())}
+        );
+
+        db.close();
+        return rowsAffected;
+    }
+
+    public void deleteContact(int contactId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(
+                TABLE_CONTACTS,
+                COLUMN_CONTACT_ID + " = ?",
+                new String[]{String.valueOf(contactId)}
+        );
+
+        db.close();
+    }
+
+    /*
+        CRUD methods implementations for messages
+    */
+    public long insertMessage(Message message) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_CONTACT_ID_FK, message.getContactId());
+        values.put(COLUMN_BODY, message.getBody());
+        values.put(COLUMN_TIMESTAMP, message.getTimestamp());
+        values.put(COLUMN_TYPE, message.getType());
+
+        long newId = db.insert(TABLE_MESSAGES, null, values);
+        db.close();
+        return newId;
+    }
+
+    public List<Message> getMessagesForContact(int contactId) {
+        List<Message> messages = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                TABLE_MESSAGES,
+                null,
+                COLUMN_CONTACT_ID_FK + " = ?",
+                new String[]{String.valueOf(contactId)},
+                null,
+                null,
+                COLUMN_TIMESTAMP + " ASC"
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                Message message = new Message(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CONTACT_ID_FK)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BODY)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_TIMESTAMP)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TYPE))
+                        );
+                message.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_MESSAGE_ID)));
+                messages.add(message);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return messages;
     }
 }
