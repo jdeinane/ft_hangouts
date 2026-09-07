@@ -8,9 +8,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-// Activity: represents a screen in the app. AppCompatActivity adds the compatibility with older
-// Android versions, which will allow us to handle the Toolbar (header's color menu)
 public class MainActivity extends AppCompatActivity {
+    // Activity: represents a screen in the app. AppCompatActivity adds the compatibility with older
+    // Android versions, which will allow us to handle the Toolbar (header's color menu)
+
 
     @Override
     /*
