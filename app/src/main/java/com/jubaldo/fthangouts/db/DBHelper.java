@@ -159,6 +159,36 @@ public class DBHelper extends SQLiteOpenHelper {
         return contacts;
     }
 
+    public Contact getContactById(int contactId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Contact contact = null;
+
+        Cursor cursor = db.query(
+                TABLE_CONTACTS,
+                null,
+                COLUMN_CONTACT_ID + " ?", // Unline getAllContacts(), we retrieve here only one row.
+                new String[]{String.valueOf(contactId)},
+                null,
+                null,
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+            contact = new Contact(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE_NUMBER)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BIRTHDAY))
+            );
+            contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CONTACT_ID)));
+        }
+
+        cursor.close();
+        db.close();
+        return contact;
+    }
+
     public int updateContact(Contact contact) {
         SQLiteDatabase db = this.getWritableDatabase();
 
