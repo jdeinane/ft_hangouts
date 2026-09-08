@@ -20,6 +20,13 @@ public class ContactDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_contact_detail);
 
         contactId = getIntent().getIntExtra(EXTRA_CONTACT_ID, -1);
+
+        findViewById(R.id.buttonDeleteContact).setOnClickListener(v -> {
+            try (DBHelper dbHelper = new DBHelper(this)) {
+                dbHelper.deleteContact(contactId);
+            }
+            finish();
+        });
     }
 
     @Override

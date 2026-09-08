@@ -214,6 +214,12 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.delete(
+                TABLE_MESSAGES,
+                COLUMN_CONTACT_ID_FK + " = ?",
+                new String[]{String.valueOf(contactId)}
+        );
+
+        db.delete(
                 TABLE_CONTACTS,
                 COLUMN_CONTACT_ID + " = ?",
                 new String[]{String.valueOf(contactId)}
