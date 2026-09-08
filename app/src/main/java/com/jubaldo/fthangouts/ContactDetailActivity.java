@@ -34,6 +34,12 @@ public class ContactDetailActivity extends AppCompatActivity {
             intent.putExtra(AddEditContactActivity.EXTRA_CONTACT_ID, contactId);
             startActivity(intent);
         });
+
+        findViewById(R.id.buttonMessageContact).setOnClickListener(v -> {
+            Intent intent = new Intent(this, ConversationActivity.class);
+            intent.putExtra(ConversationActivity.EXTRA_CONTACT_ID, contactId);
+            startActivity(intent);
+        });
     }
 
     @Override
