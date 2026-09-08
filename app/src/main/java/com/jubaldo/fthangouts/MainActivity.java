@@ -1,10 +1,14 @@
 package com.jubaldo.fthangouts;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -17,20 +21,20 @@ import com.jubaldo.fthangouts.model.Contact;
 
 import java.util.List;
 
-/*
-    Activity: represents a screen in the app. AppCompatActivity adds the compatibility with older
-    Android versions, which will allow us to handle the Toolbar (header's color menu)
-*/
-
+/**
+ * Activity: represents a screen in the app. AppCompatActivity adds the compatibility with older
+ * Android versions, which will allow us to handle the Toolbar (header's color menu)
+ */
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
+    private static final int PERMISSION_REQUEST_SMS = 100;
 
-    /*
-        Activity Lifecycle (subject PDF): onCreate() is the first call ever at the screen creation.
-        It contains all the initialization code.
-        Rule: always call super.onCreate() first, or else it will crash.
-    */
+    /**
+     * Activity Lifecycle (subject PDF): onCreate() is the first call ever at the screen creation.
+     * It contains all the initialization code.
+     * Rule: always call super.onCreate() first, or else it will crash.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        requestSmsPermissionsIfNeeded();
+
         recyclerView = findViewById(R.id.recyclerViewContacts);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -59,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, AddEditContactActivity.class)));
     }
 
-    /*
-        onResume() is called every time the activity comes back to the foreground.
-        We reload the contacts list here so new or modified contacts appear immediately
-        when returning from AddEditContactActivity.
-    */
+    /**
+     * onResume() is called every time the activity comes back to the foreground.
+     * We reload the contacts list here so new or modified contacts appear immediately
+     * when returning from AddEditContactActivity.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -78,5 +84,30 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(ContactDetailActivity.EXTRA_CONTACT_ID, contact.getId());
             startActivity(intent);
         }));
+    }
+
+    /**
+     * Checks if all required SMS permissions (SEND_SMS, READ_SMS, RECEIVE_SMS) are granted.
+     * Prompts the system permission dialog if any of them is missing.
+     */
+    private void requestSmsPermissionsIfNeeded() {
+        String[] permissions = {
+                Manifest.permission.SEND_SMS,
+                Manifest.permission.READ_SMS,
+                Manifest.permission.RECEIVE_SMS
+        };
+
+        boolean allGranted = true;
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                allGranted = false;
+                break;
+            }
+        }
+
+        if (!allGranted) {
+            ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_SMS);
+        }
     }
 }

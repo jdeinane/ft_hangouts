@@ -12,16 +12,16 @@ import com.jubaldo.fthangouts.model.Message;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-    Class that handles ft_hangout's SQLite database.
-    Inherits of SQLiteOpenHelper, a class provided by Android SDK that handles
-    creation and updates of a local database stored in the cellphone.
-    Defines these two table's structure:
-        - contacts (with the five mandatory fields)
-        - messages (linked to a contact via a FK, to store content, timestamp and direction)
-
-    Unique entry point to data persistence.
-*/
+/**
+ * Class that handles ft_hangout's SQLite database.
+ * Inherits of SQLiteOpenHelper, a class provided by Android SDK that handles
+ * creation and updates of a local database stored in the cellphone.
+ * Defines these two table's structure:
+ *     - contacts (with the five mandatory fields)
+ *     - messages (linked to a contact via a FK, to store content, timestamp and direction)
+ *
+ * Unique entry point to data persistence.
+ */
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ft_hangouts.db";
@@ -62,32 +62,32 @@ public class DBHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + COLUMN_CONTACT_ID_FK + ") REFERENCES " + TABLE_CONTACTS + "(" + COLUMN_CONTACT_ID + ")" +
                     ");";
 
-    /*
-        DBHelper's constructor.
-        Context is the environment in which the app runs and transmits it to SQLiteOpenHelper's constructor
-        via super(...).
-        Mandatory crossing point to create a DBHelper instance correctly configured with the database's
-        name and its version.
-    */
+    /**
+     * DBHelper's constructor.
+     * Context is the environment in which the app runs and transmits it to SQLiteOpenHelper's constructor
+     * via super(...).
+     * Mandatory crossing point to create a DBHelper instance correctly configured with the database's
+     * name and its version.
+     */
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    /*
-        onCreate() executes `CREATE TABLE` SQL queries for the app's first launch ever.
-    */
+    /**
+     * onCreate() executes `CREATE TABLE` SQL queries for the app's first launch ever.
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_CONTACTS);
         db.execSQL(CREATE_TABLE_MESSAGES);
     }
 
-    /*
-        onUpgrade() handles the case where the database's structure changes in the future.
-        Automatically called if DATABASE_VERSION is changed.
-        For this project, we delete and recreate the tables, but in prod, we would use
-        `ALTER TABLE` to properly migrate.
-    */
+    /**
+     * onUpgrade() handles the case where the database's structure changes in the future.
+     * Automatically called if DATABASE_VERSION is changed.
+     * For this project, we delete and recreate the tables, but in prod, we would use
+     * `ALTER TABLE` to properly migrate.
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
@@ -95,13 +95,13 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    /*
-        CRUD methods implementations for contacts:
-            - create contact
-            - read contact
-            - update contact
-            - delete contact
-    */
+    /**
+     * CRUD methods implementations for contacts:
+     *     - create contact
+     *     - read contact
+     *     - update contact
+     *     - delete contact
+     */
     public long insertContact(Contact contact) {
         // getWritableDatabase(): request a write connection to the DB from SQLiteOpenHelper
         // Android checks if the .db file exists - else, automatically calls onCreate()
@@ -228,9 +228,9 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    /*
-        CRUD methods implementations for messages
-    */
+    /**
+     * CRUD methods implementations for messages
+     */
     public long insertMessage(Message message) {
         SQLiteDatabase db = this.getWritableDatabase();
 

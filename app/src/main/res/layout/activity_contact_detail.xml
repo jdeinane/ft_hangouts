@@ -44,6 +44,13 @@
         android:text="@string/action_edit" />
 
     <Button
+        android:id="@+id/buttonMessageContact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/action_message" />
+
+    <Button
         android:id="@+id/buttonDeleteContact"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

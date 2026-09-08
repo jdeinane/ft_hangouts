@@ -13,11 +13,11 @@ import com.jubaldo.fthangouts.model.Contact;
 
 import java.util.List;
 
-/*
-    Central piece of the RecyclerView system.
-    Its role is to link the Contact list (data) and the screen views (ex: item_contact.xml layout), by row.
-    An Adapter is an object that transforms each element of a list into a view to be displayed.
-*/
+/**
+ * Central piece of the RecyclerView system.
+ * Its role is to link the Contact list (data) and the screen views (ex: item_contact.xml layout), by row.
+ * An Adapter is an object that transforms each element of a list into a view to be displayed.
+ */
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
 
     public interface OnContactClickListener {
@@ -32,11 +32,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         this.listener = listener;
     }
 
-    /*
-        ContactViewHolder: 'box' or container that stores in memory, once for all,
-        the references towards the two TextView, from a physical row to the screen.
-        Used to avoid multiple calls of findViewById(...) each list scrolling (performance optimization).
-    */
+    /**
+     * ContactViewHolder: 'box' or container that stores in memory, once for all,
+     * the references towards the two TextView, from a physical row to the screen.
+     * Used to avoid multiple calls of findViewById(...) each list scrolling (performance optimization).
+     */
     public static class ContactViewHolder extends RecyclerView.ViewHolder {
 
         TextView textContactName;
@@ -49,12 +49,12 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         }
     }
     
-    /*
-        Called by RecyclerView only when it needs a new row to display (not by each existing row,
-        it recycles the views from the screen).
-        LayoutInflater.from(...).inflate(...) transforms the XML file item_contact.xml to a real
-        Java View object usable.
-    */
+    /**
+     * Called by RecyclerView only when it needs a new row to display (not by each existing row,
+     * it recycles the views from the screen).
+     * LayoutInflater.from(...).inflate(...) transforms the XML file item_contact.xml to a real
+     * Java View object usable.
+     */
     @NonNull
     @Override
     public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -63,9 +63,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         return new ContactViewHolder(view);
     }
 
-    /*
-        Called to fill a row with the contact's data at the given position in the list.
-    */
+    /**
+     * Called to fill a row with the contact's data at the given position in the list.
+     */
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         Contact contact = contacts.get(position);
@@ -75,9 +75,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         holder.itemView.setOnClickListener(v -> listener.onContactClick(contact));
     }
 
-    /*
-        Informs the RecyclerView the total number of rows so it knows how far to scroll.
-    */
+    /**
+     * Informs the RecyclerView the total number of rows so it knows how far to scroll.
+     */
     @Override
     public int getItemCount() {
         return contacts.size();

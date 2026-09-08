@@ -10,12 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.jubaldo.fthangouts.db.DBHelper;
 import com.jubaldo.fthangouts.model.Contact;
 
-/*
-    - Load the visual XML file (activity_add_edit_contact.xml) via setContentView().
-    - Link the screen's visual elements to Java code by their ids (R.id.editFirstName, etc.).
-    - Validate the entered data.
-    - Save in database and close the screen.
-*/
+/**
+ * - Load the visual XML file (activity_add_edit_contact.xml) via setContentView().
+ * - Link the screen's visual elements to Java code by their ids (R.id.editFirstName, etc.).
+ * - Validate the entered data.
+ * - Save in database and close the screen.
+ */
 public class AddEditContactActivity extends AppCompatActivity {
 
     public static final String EXTRA_CONTACT_ID = "contact_id";
