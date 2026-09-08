@@ -166,7 +166,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(
                 TABLE_CONTACTS,
                 null,
-                COLUMN_CONTACT_ID + " ?", // Unline getAllContacts(), we retrieve here only one row.
+                COLUMN_CONTACT_ID + " = ?", // Unlike getAllContacts(), we retrieve here only one row.
                 new String[]{String.valueOf(contactId)},
                 null,
                 null,

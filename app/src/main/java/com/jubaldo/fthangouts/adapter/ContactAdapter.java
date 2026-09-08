@@ -19,10 +19,17 @@ import java.util.List;
     An Adapter is an object that transforms each element of a list into a view to be displayed.
 */
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
-    private final List<Contact> contacts;
 
-    public ContactAdapter(List<Contact> contacts) {
+    public interface OnContactClickListener {
+        void onContactClick(Contact contact);
+    }
+
+    private final List<Contact> contacts;
+    private final OnContactClickListener listener;
+
+    public ContactAdapter(List<Contact> contacts, OnContactClickListener listener) {
         this.contacts = contacts;
+        this.listener = listener;
     }
 
     /*
@@ -65,6 +72,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         String fullName = contact.getFirstName() + " " + contact.getLastName();
         holder.textContactName.setText(fullName);
         holder.textContactPhone.setText(contact.getPhoneNumber());
+        holder.itemView.setOnClickListener(v -> listener.onContactClick(contact));
     }
 
     /*
