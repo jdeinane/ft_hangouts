@@ -1,6 +1,7 @@
 package com.jubaldo.fthangouts;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,12 +18,16 @@ import com.jubaldo.fthangouts.model.Contact;
 */
 public class AddEditContactActivity extends AppCompatActivity {
 
+    public static final String EXTRA_CONTACT_ID = "contact_id";
+
     // EditText allows user to write and modify text on screen (equivalent of <input type="text">).
     private EditText editFirstName;
     private EditText editLastName;
     private EditText editPhoneNumber;
     private EditText editEmail;
     private EditText editBirthday;
+
+    private int contactId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +40,24 @@ public class AddEditContactActivity extends AppCompatActivity {
         editEmail = findViewById(R.id.editEmail);
         editBirthday = findViewById(R.id.editBirthday);
 
-        // Attach the "Click Listener" to the button.
-        // v -> saveContact() is a lambda function: for each click, Android calls this function
-        // that calls saveContact().
-        findViewById(R.id.buttonSave).setOnClickListener(v -> saveContact());
+        Button buttonSave = findViewById(R.id.buttonSave);
+
+        contactId = getIntent().getIntExtra(EXTRA_CONTACT_ID, -1);
+
+        if (contactId != -1) {
+            buttonSave.setText(R.string.action_update);
+
+            try (DBHelper dbHelper = new DBHelper(this)) {
+                Contact contact = dbHelper.getContactById(contactId);
+                editFirstName.setText(contact.getFirstName());
+                editLastName.setText(contact.getLastName());
+                editPhoneNumber.setText(contact.getPhoneNumber());
+                editEmail.setText(contact.getEmail());
+                editBirthday.setText(contact.getBirthday());
+            }
+        }
+
+        buttonSave.setOnClickListener(v -> saveContact());
     }
 
     private void saveContact() {
@@ -57,7 +76,12 @@ public class AddEditContactActivity extends AppCompatActivity {
         Contact contact = new Contact(firstName, lastName, phoneNumber, email, birthday);
 
         try (DBHelper dbHelper = new DBHelper(this)) {
-            dbHelper.insertContact(contact);
+            if (contactId == -1) {
+                dbHelper.insertContact(contact);
+            } else {
+                contact.setId(contactId);
+                dbHelper.updateContact(contact);
+            }
         }
 
         // Close this activity and automatically go back to previous screen (MainActivity)

@@ -1,5 +1,6 @@
 package com.jubaldo.fthangouts;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -26,6 +27,12 @@ public class ContactDetailActivity extends AppCompatActivity {
                 dbHelper.deleteContact(contactId);
             }
             finish();
+        });
+
+        findViewById(R.id.buttonEditContact).setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddEditContactActivity.class);
+            intent.putExtra(AddEditContactActivity.EXTRA_CONTACT_ID, contactId);
+            startActivity(intent);
         });
     }
 
