@@ -73,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
             contacts = dbHelper.getAllContacts();
         }
 
-        recyclerView.setAdapter(new ContactAdapter(contacts));
+        recyclerView.setAdapter(new ContactAdapter(contacts, contact -> {
+            Intent intent = new Intent(this, ContactDetailActivity.class);
+            intent.putExtra(ContactDetailActivity.EXTRA_CONTACT_ID, contact.getId());
+            startActivity(intent);
+        }));
     }
 }

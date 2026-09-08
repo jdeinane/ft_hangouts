@@ -8,4 +8,7 @@
     <string name="hint_email">Email</string>
     <string name="hint_birthday">Birthday (dd/mm/yyyy)</string>
     <string name="action_save">Save</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="format_full_name">%1$s %2$s</string>
 </resources>
