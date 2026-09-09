@@ -4,12 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.jubaldo.fthangouts.db.DBHelper;
 import com.jubaldo.fthangouts.model.Contact;
 
-public class ContactDetailActivity extends AppCompatActivity {
+public class ContactDetailActivity extends BaseActivity {
 
     public static final String EXTRA_CONTACT_ID = "contact_id";
 
@@ -19,6 +17,7 @@ public class ContactDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_detail);
+        setupToolbar();
 
         contactId = getIntent().getIntExtra(EXTRA_CONTACT_ID, -1);
 

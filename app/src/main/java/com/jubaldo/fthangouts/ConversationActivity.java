@@ -7,7 +7,6 @@ import android.telephony.SmsManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,7 +23,7 @@ import java.util.List;
  * Loads message history from SQLite database and displays it in a RecyclerView.
  * Handles sending new SMS messages via SmsManager and saving them to the database.
  */
-public class ConversationActivity extends AppCompatActivity {
+public class ConversationActivity extends BaseActivity {
 
     public static final String EXTRA_CONTACT_ID = "contact_id";
 
@@ -37,6 +36,7 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
+        setupToolbar();
 
         contactId = getIntent().getIntExtra(EXTRA_CONTACT_ID, -1);
 

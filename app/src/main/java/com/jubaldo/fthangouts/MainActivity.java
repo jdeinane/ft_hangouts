@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -25,7 +24,7 @@ import java.util.List;
  * Activity: represents a screen in the app. AppCompatActivity adds the compatibility with older
  * Android versions, which will allow us to handle the Toolbar (header's color menu)
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
     private static final int PERMISSION_REQUEST_SMS = 100;
@@ -45,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         // R: auto-generated class by Android Studio that references all our resources
         // (layout, strings, images...). We never edit it ourselves.
         setContentView(R.layout.activity_main);
+        setupToolbar();
 
         // Complements EdgeToEdge
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

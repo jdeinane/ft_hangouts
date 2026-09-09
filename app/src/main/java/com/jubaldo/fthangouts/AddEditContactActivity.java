@@ -5,8 +5,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.jubaldo.fthangouts.db.DBHelper;
 import com.jubaldo.fthangouts.model.Contact;
 
@@ -16,7 +14,7 @@ import com.jubaldo.fthangouts.model.Contact;
  * - Validate the entered data.
  * - Save in database and close the screen.
  */
-public class AddEditContactActivity extends AppCompatActivity {
+public class AddEditContactActivity extends BaseActivity {
 
     public static final String EXTRA_CONTACT_ID = "contact_id";
 
@@ -33,6 +31,7 @@ public class AddEditContactActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_contact);
+        setupToolbar();
 
         editFirstName = findViewById(R.id.editFirstName);
         editLastName = findViewById(R.id.editLastName);

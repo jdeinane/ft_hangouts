@@ -20,4 +20,10 @@
     <string name="format_last_backgrounded">Last backgrounded at %1$s</string>
     <string name="error_required_fields">First name, last name and phone number are required!</string>
     <string name="error_sms_permission_denied">SMS permission not granted</string>
+    <string name="menu_change_header_color">Change header color</string>
+    <string name="color_default">Default</string>
+    <string name="color_red">Red</string>
+    <string name="color_green">Green</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_pink">Pink</string>
 </resources>
