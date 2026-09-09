@@ -16,4 +16,5 @@
     <string name="hint_message_body">Type a message</string>
     <string name="action_send">Send</string>
     <string name="label_me">Me</string>
+    <string name="format_new_message_toast">New message from %1$s</string>
 </resources>
