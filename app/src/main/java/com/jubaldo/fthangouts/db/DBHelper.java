@@ -189,6 +189,39 @@ public class DBHelper extends SQLiteOpenHelper {
         return contact;
     }
 
+    public Contact getContactByPhoneNumber(String phoneNumber) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Contact contact = null;
+
+        Cursor cursor = db.query(
+                TABLE_CONTACTS,
+                null,
+                COLUMN_PHONE_NUMBER + " = ?",
+                new String[]{phoneNumber},
+                null,
+                null,
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+            contact = new Contact(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE_NUMBER)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BIRTHDAY))
+            );
+            contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CONTACT_ID)));
+        }
+
+        cursor.close();
+        db.close();
+        return contact;
+
+        // For now, phone numbers with country code (ex: "+33612345678") will not be considered
+        // identical to "0612345678".
+    }
+
     public int updateContact(Contact contact) {
         SQLiteDatabase db = this.getWritableDatabase();
 
