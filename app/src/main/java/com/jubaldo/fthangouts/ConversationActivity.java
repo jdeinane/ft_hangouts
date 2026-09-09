@@ -84,7 +84,7 @@ public class ConversationActivity extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "SMS permission not granted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_sms_permission_denied), Toast.LENGTH_SHORT).show();
             return;
         }
 

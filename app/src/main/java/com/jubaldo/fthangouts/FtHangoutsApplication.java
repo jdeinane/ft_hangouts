@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -22,7 +24,17 @@ Application.ActivityLifecycleCallbacks {
     private static final String PREFS_NAME = "ft_hangouts_prefs";
     private static final String KEY_LAST_BACKGROUND_TIMESTAMP = "last_background_timestamp";
 
+    // A screen rotation destroys and recreates the current activity (onStop then onStart),
+    // which briefly drops startedActivityCount to 0 exactly like a real backgrounding would.
+    // Debouncing the "backgrounded" transition lets a same-app stop/start pair (rotation,
+    // or a new activity of this app opening) cancel itself out before it is treated as real.
+    private static final long BACKGROUND_DEBOUNCE_MS = 500;
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable saveBackgroundTimestampRunnable = this::saveBackgroundTimestamp;
+
     private int startedActivityCount = 0;
+    private boolean backgroundSavePending = false;
 
     @Override
     public void onCreate() {
@@ -35,7 +47,12 @@ Application.ActivityLifecycleCallbacks {
         startedActivityCount++;
 
         if (startedActivityCount == 1) {
-            showLastBackgroundedToast(activity);
+            handler.removeCallbacks(saveBackgroundTimestampRunnable);
+
+            if (!backgroundSavePending) {
+                showLastBackgroundedToast(activity);
+            }
+            backgroundSavePending = false;
         }
     }
 
@@ -44,11 +61,14 @@ Application.ActivityLifecycleCallbacks {
         startedActivityCount--;
 
         if (startedActivityCount == 0) {
-            saveBackgroundTimestamp();
+            backgroundSavePending = true;
+            handler.postDelayed(saveBackgroundTimestampRunnable, BACKGROUND_DEBOUNCE_MS);
         }
     }
 
     private void saveBackgroundTimestamp() {
+        backgroundSavePending = false;
+
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         prefs.edit().putLong(KEY_LAST_BACKGROUND_TIMESTAMP, System.currentTimeMillis()).apply();
     }

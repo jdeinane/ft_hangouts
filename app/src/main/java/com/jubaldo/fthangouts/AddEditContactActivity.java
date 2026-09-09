@@ -68,7 +68,7 @@ public class AddEditContactActivity extends AppCompatActivity {
         String birthday = editBirthday.getText().toString().trim();
 
         if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty()) {
-            Toast.makeText(this, "First name, last name and phone number are required!",
+            Toast.makeText(this, getString(R.string.error_required_fields),
                     Toast.LENGTH_SHORT).show();
             return;
         }
