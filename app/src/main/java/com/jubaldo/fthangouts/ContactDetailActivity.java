@@ -2,6 +2,7 @@ package com.jubaldo.fthangouts;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.jubaldo.fthangouts.db.DBHelper;
@@ -21,24 +22,29 @@ public class ContactDetailActivity extends BaseActivity {
 
         contactId = getIntent().getIntExtra(EXTRA_CONTACT_ID, -1);
 
-        findViewById(R.id.buttonDeleteContact).setOnClickListener(v -> {
+        View buttonDeleteContact = findViewById(R.id.buttonDeleteContact);
+        buttonDeleteContact.setOnClickListener(v -> {
             try (DBHelper dbHelper = new DBHelper(this)) {
                 dbHelper.deleteContact(contactId);
             }
             finish();
         });
 
-        findViewById(R.id.buttonEditContact).setOnClickListener(v -> {
+        View buttonEditContact = findViewById(R.id.buttonEditContact);
+        buttonEditContact.setOnClickListener(v -> {
             Intent intent = new Intent(this, AddEditContactActivity.class);
             intent.putExtra(AddEditContactActivity.EXTRA_CONTACT_ID, contactId);
             startActivity(intent);
         });
 
-        findViewById(R.id.buttonMessageContact).setOnClickListener(v -> {
+        View buttonMessageContact = findViewById(R.id.buttonMessageContact);
+        buttonMessageContact.setOnClickListener(v -> {
             Intent intent = new Intent(this, ConversationActivity.class);
             intent.putExtra(ConversationActivity.EXTRA_CONTACT_ID, contactId);
             startActivity(intent);
         });
+
+        registerColorableViews(buttonEditContact, buttonMessageContact, buttonDeleteContact);
     }
 
     @Override

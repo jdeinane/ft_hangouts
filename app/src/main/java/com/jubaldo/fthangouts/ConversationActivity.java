@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -45,7 +46,10 @@ public class ConversationActivity extends BaseActivity {
 
         editMessageBody = findViewById(R.id.editMessageBody);
 
-        findViewById(R.id.buttonSendMessage).setOnClickListener(v -> sendMessage());
+        View buttonSendMessage = findViewById(R.id.buttonSendMessage);
+        buttonSendMessage.setOnClickListener(v -> sendMessage());
+
+        registerColorableViews(buttonSendMessage);
     }
 
     @Override

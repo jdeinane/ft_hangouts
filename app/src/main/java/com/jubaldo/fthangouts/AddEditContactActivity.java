@@ -57,6 +57,8 @@ public class AddEditContactActivity extends BaseActivity {
         }
 
         buttonSave.setOnClickListener(v -> saveContact());
+
+        registerColorableViews(buttonSave);
     }
 
     private void saveContact() {

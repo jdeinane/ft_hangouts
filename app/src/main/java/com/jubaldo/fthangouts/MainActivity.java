@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.core.app.ActivityCompat;
@@ -61,8 +62,11 @@ public class MainActivity extends BaseActivity {
         // Intent: message sent to Android system to ask to do something:
         // here, we ask "launch the AddEditContactActivity activity".
         // startActivity(): run this Intent, that displays the new screen on top of the current screen.
-        findViewById(R.id.fabAddContact).setOnClickListener(v ->
+        View fabAddContact = findViewById(R.id.fabAddContact);
+        fabAddContact.setOnClickListener(v ->
                 startActivity(new Intent(this, AddEditContactActivity.class)));
+
+        registerColorableViews(fabAddContact);
     }
 
     /**
