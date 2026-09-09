@@ -17,4 +17,5 @@
     <string name="action_send">Send</string>
     <string name="label_me">Me</string>
     <string name="format_new_message_toast">New message from %1$s</string>
+    <string name="format_last_backgrounded">Last backgrounded at %1$s</string>
 </resources>
