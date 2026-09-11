@@ -189,37 +189,30 @@ public class DBHelper extends SQLiteOpenHelper {
         return contact;
     }
 
+    /**
+     * Matches regardless of prefix (0612345678, +33612345678, 33612345678 are all
+     * considered the same number) by comparing only the last 9 digits, since an
+     * incoming SMS's sender address is often in international format while contacts
+     * are usually saved in local format.
+     */
     public Contact getContactByPhoneNumber(String phoneNumber) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Contact contact = null;
+        String normalizedTarget = normalizePhoneNumber(phoneNumber);
 
-        Cursor cursor = db.query(
-                TABLE_CONTACTS,
-                null,
-                COLUMN_PHONE_NUMBER + " = ?",
-                new String[]{phoneNumber},
-                null,
-                null,
-                null
-        );
-
-        if (cursor.moveToFirst()) {
-            contact = new Contact(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE_NUMBER)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BIRTHDAY))
-            );
-            contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CONTACT_ID)));
+        for (Contact contact : getAllContacts()) {
+            if (normalizePhoneNumber(contact.getPhoneNumber()).equals(normalizedTarget)) {
+                return contact;
+            }
         }
 
-        cursor.close();
-        db.close();
-        return contact;
+        return null;
+    }
 
-        // For now, phone numbers with country code (ex: "+33612345678") will not be considered
-        // identical to "0612345678".
+    private static String normalizePhoneNumber(String phoneNumber) {
+        String digitsOnly = phoneNumber.replaceAll("[^0-9]", "");
+        if (digitsOnly.length() > 9) {
+            digitsOnly = digitsOnly.substring(digitsOnly.length() - 9);
+        }
+        return digitsOnly;
     }
 
     public int updateContact(Contact contact) {
