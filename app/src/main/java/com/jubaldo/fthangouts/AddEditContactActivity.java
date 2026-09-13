@@ -8,6 +8,12 @@ import android.widget.Toast;
 import com.jubaldo.fthangouts.db.DBHelper;
 import com.jubaldo.fthangouts.model.Contact;
 
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.regex.Pattern;
+
 /**
  * - Load the visual XML file (activity_add_edit_contact.xml) via setContentView().
  * - Link the screen's visual elements to Java code by their ids (R.id.editFirstName, etc.).
@@ -74,6 +80,12 @@ public class AddEditContactActivity extends BaseActivity {
             return;
         }
 
+        if (!birthday.isEmpty() && !isValidBirthday(birthday)) {
+            Toast.makeText(this, getString(R.string.error_invalid_birthday),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Contact contact = new Contact(firstName, lastName, phoneNumber, email, birthday);
 
         try (DBHelper dbHelper = new DBHelper(this)) {
@@ -88,5 +100,33 @@ public class AddEditContactActivity extends BaseActivity {
         // Close this activity and automatically go back to previous screen (MainActivity)
         // (equivalent to "Return" button).
         finish();
+    }
+
+    // SimpleDateFormat's "yyyy"/"dd"/"MM" pattern letters only set a *minimum* digit count when
+    // parsing, not a maximum, so without this the field happily consumes extra digits (e.g.
+    // "11/11/19111" parses as year 19111). Enforcing the exact digit shape first catches that.
+    private static final Pattern BIRTHDAY_SHAPE = Pattern.compile("\\d{2}/\\d{2}/\\d{4}");
+
+    private static boolean isValidBirthday(String birthday) {
+        if (!BIRTHDAY_SHAPE.matcher(birthday).matches()) {
+            return false;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        dateFormat.setLenient(false);
+
+        ParsePosition position = new ParsePosition(0);
+        Date parsedDate = dateFormat.parse(birthday, position);
+
+        // parse() only fills in errorIndex on failure and otherwise stops silently at the
+        // first unparsable character, so require the whole string to have been consumed
+        // (rejects non-existent calendar dates like 31/02/2026).
+        if (position.getErrorIndex() != -1 || position.getIndex() != birthday.length()) {
+            return false;
+        }
+
+        // A birthday can't be in the future.
+        assert parsedDate != null;
+        return !parsedDate.after(new Date());
     }
 }

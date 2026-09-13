@@ -18,6 +18,7 @@
     <string name="format_new_message_toast">New message from %1$s</string>
     <string name="format_last_backgrounded">Last backgrounded at %1$s</string>
     <string name="error_required_fields">First name, last name and phone number are required!</string>
+    <string name="error_invalid_birthday">Birthday must be a valid date (dd/mm/yyyy)</string>
     <string name="error_sms_permission_denied">SMS permission not granted</string>
     <string name="menu_change_header_color">Change header color</string>
     <string name="color_default">Default</string>

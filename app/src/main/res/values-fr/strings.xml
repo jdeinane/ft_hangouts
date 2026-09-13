@@ -18,6 +18,7 @@
     <string name="format_new_message_toast">Nouveau message de %1$s</string>
     <string name="format_last_backgrounded">Dernière mise en arrière-plan à %1$s</string>
     <string name="error_required_fields">Le prénom, le nom et le numéro de téléphone sont obligatoires !</string>
+    <string name="error_invalid_birthday">La date de naissance doit être valide (jj/mm/aaaa)</string>
     <string name="error_sms_permission_denied">Permission SMS refusée</string>
     <string name="menu_change_header_color">Changer la couleur de l\'en-tête</string>
     <string name="color_default">Défaut</string>
