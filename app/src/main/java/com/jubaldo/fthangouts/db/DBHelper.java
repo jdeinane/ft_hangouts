@@ -19,7 +19,6 @@ import java.util.List;
  * Defines these two table's structure:
  *     - contacts (with the five mandatory fields)
  *     - messages (linked to a contact via a FK, to store content, timestamp and direction)
- *
  * Unique entry point to data persistence.
  */
 public class DBHelper extends SQLiteOpenHelper {
@@ -102,11 +101,7 @@ public class DBHelper extends SQLiteOpenHelper {
      *     - update contact
      *     - delete contact
      */
-    public long insertContact(Contact contact) {
-        // getWritableDatabase(): request a write connection to the DB from SQLiteOpenHelper
-        // Android checks if the .db file exists - else, automatically calls onCreate()
-        SQLiteDatabase db = this.getWritableDatabase();
-
+    private static ContentValues contactToContentValues(Contact contact) {
         // ContentValues(): key-value structure - associates a column name to a value.
         ContentValues values = new ContentValues();
 
@@ -116,12 +111,32 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_EMAIL, contact.getEmail());
         values.put(COLUMN_BIRTHDAY, contact.getBirthday());
 
+        return values;
+    }
+
+    private static Contact contactFromCursor(Cursor cursor) {
+        Contact contact = new Contact(
+                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE_NUMBER)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BIRTHDAY))
+        );
+        contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CONTACT_ID)));
+        return contact;
+    }
+
+    public void insertContact(Contact contact) {
+        // getWritableDatabase(): request a write connection to the DB from SQLiteOpenHelper
+        // Android checks if the .db file exists - else, automatically calls onCreate()
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = contactToContentValues(contact);
+
         // db.insert(...): inserts a new line.
-        long newId = db.insert(TABLE_CONTACTS, null, values);
+        db.insert(TABLE_CONTACTS, null, values);
 
         // db.close(): close the connection to the DB when the operation is finished.
         db.close();
-        return newId;
     }
 
     public List<Contact> getAllContacts() {
@@ -142,15 +157,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                Contact contact = new Contact(
-                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE_NUMBER)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BIRTHDAY))
-                );
-                contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CONTACT_ID)));
-                contacts.add(contact);
+                contacts.add(contactFromCursor(cursor));
             } while (cursor.moveToNext());
         }
 
@@ -174,14 +181,7 @@ public class DBHelper extends SQLiteOpenHelper {
         );
 
         if (cursor.moveToFirst()) {
-            contact = new Contact(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PHONE_NUMBER)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EMAIL)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BIRTHDAY))
-            );
-            contact.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CONTACT_ID)));
+            contact = contactFromCursor(cursor);
         }
 
         cursor.close();
@@ -215,17 +215,11 @@ public class DBHelper extends SQLiteOpenHelper {
         return digitsOnly;
     }
 
-    public int updateContact(Contact contact) {
+    public void updateContact(Contact contact) {
         SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = contactToContentValues(contact);
 
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_FIRST_NAME, contact.getFirstName());
-        values.put(COLUMN_LAST_NAME, contact.getLastName());
-        values.put(COLUMN_PHONE_NUMBER, contact.getPhoneNumber());
-        values.put(COLUMN_EMAIL, contact.getEmail());
-        values.put(COLUMN_BIRTHDAY, contact.getBirthday());
-
-        int rowsAffected = db.update(
+        db.update(
                 TABLE_CONTACTS,
                 values,
                 COLUMN_CONTACT_ID + " = ?",
@@ -233,7 +227,6 @@ public class DBHelper extends SQLiteOpenHelper {
         );
 
         db.close();
-        return rowsAffected;
     }
 
     public void deleteContact(int contactId) {
@@ -257,7 +250,7 @@ public class DBHelper extends SQLiteOpenHelper {
     /**
      * CRUD methods implementations for messages
      */
-    public long insertMessage(Message message) {
+    public void insertMessage(Message message) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -266,9 +259,8 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_TIMESTAMP, message.getTimestamp());
         values.put(COLUMN_TYPE, message.getType());
 
-        long newId = db.insert(TABLE_MESSAGES, null, values);
+        db.insert(TABLE_MESSAGES, null, values);
         db.close();
-        return newId;
     }
 
     public List<Message> getMessagesForContact(int contactId) {

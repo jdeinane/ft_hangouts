@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">ft_hangouts</string>
     <string name="add_contact">Ajouter un contact</string>
-    <string name="title_add_contact">Ajouter un contact</string>
     <string name="hint_first_name">Prénom</string>
     <string name="hint_last_name">Nom</string>
     <string name="hint_phone_number">Numéro de téléphone</string>
