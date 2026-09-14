@@ -21,33 +21,55 @@ import com.jubaldo.fthangouts.model.Message;
  */
 public class SmsReceiver extends BroadcastReceiver {
 
+    // Lets an already-open ConversationActivity refresh immediately instead of only picking up
+    // the new message the next time it resumes.
+    public static final String ACTION_MESSAGE_RECEIVED = "com.jubaldo.fthangouts.MESSAGE_RECEIVED";
+    public static final String EXTRA_CONTACT_ID = "contact_id";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         SmsMessage[] messages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
-        if (messages == null) {
+        if (messages == null || messages.length == 0) {
             return;
         }
 
-        for (SmsMessage smsMessage : messages) {
-            String senderNumber = smsMessage.getOriginatingAddress();
-            String body = smsMessage.getMessageBody();
+        // A single SMS longer than one segment (very easy to hit with emoji, which encode as
+        // multiple UTF-16 units each) arrives as several SmsMessage parts sharing the same
+        // sender - they must be concatenated back into one message rather than saved separately.
+        String senderNumber = messages[0].getOriginatingAddress();
+        if (senderNumber == null) {
+            return;
+        }
 
-            if (senderNumber == null || body == null) {
-                continue;
+        StringBuilder bodyBuilder = new StringBuilder();
+        for (SmsMessage part : messages) {
+            String partBody = part.getMessageBody();
+            if (partBody != null) {
+                bodyBuilder.append(partBody);
             }
+        }
+        String body = bodyBuilder.toString();
 
-            try (DBHelper dbHelper = new DBHelper(context)) {
-                Contact contact = dbHelper.getContactByPhoneNumber(senderNumber);
+        if (body.isEmpty()) {
+            return;
+        }
 
-                // Only receive SMS from saved contacts
-                // in the DB: a message has to belong to an existent contact.
-                if (contact != null) {
-                    Message message = new Message(contact.getId(), body, System.currentTimeMillis(), Message.TYPE_RECEIVED);
-                    dbHelper.insertMessage(message);
+        try (DBHelper dbHelper = new DBHelper(context)) {
+            Contact contact = dbHelper.getContactByPhoneNumber(senderNumber);
 
-                    Toast.makeText(context, context.getString(R.string.format_new_message_toast, contact.getFirstName()),
-                            Toast.LENGTH_SHORT).show();
-                }
+            // Only receive SMS from saved contacts
+            // in the DB: a message has to belong to an existent contact.
+            if (contact != null) {
+                Message message = new Message(contact.getId(), body, System.currentTimeMillis(), Message.TYPE_RECEIVED);
+                dbHelper.insertMessage(message);
+
+                Toast.makeText(context, context.getString(R.string.format_new_message_toast, contact.getFirstName()),
+                        Toast.LENGTH_SHORT).show();
+
+                Intent messageReceivedIntent = new Intent(ACTION_MESSAGE_RECEIVED);
+                messageReceivedIntent.setPackage(context.getPackageName());
+                messageReceivedIntent.putExtra(EXTRA_CONTACT_ID, contact.getId());
+                context.sendBroadcast(messageReceivedIntent);
             }
         }
     }

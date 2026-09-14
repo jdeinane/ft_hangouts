@@ -1,6 +1,10 @@
 package com.jubaldo.fthangouts;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
@@ -16,6 +20,7 @@ import com.jubaldo.fthangouts.adapter.MessageAdapter;
 import com.jubaldo.fthangouts.db.DBHelper;
 import com.jubaldo.fthangouts.model.Contact;
 import com.jubaldo.fthangouts.model.Message;
+import com.jubaldo.fthangouts.receiver.SmsReceiver;
 
 import java.util.List;
 
@@ -32,6 +37,18 @@ public class ConversationActivity extends BaseActivity {
     private EditText editMessageBody;
     private Contact contact;
     private int contactId;
+
+    // Refreshes the thread immediately when a new message for this contact arrives while the
+    // conversation is already open, instead of only picking it up on the next onResume().
+    private final BroadcastReceiver messageReceivedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int receivedContactId = intent.getIntExtra(SmsReceiver.EXTRA_CONTACT_ID, -1);
+            if (receivedContactId == contactId) {
+                loadContactAndMessages();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +73,15 @@ public class ConversationActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         loadContactAndMessages();
+
+        IntentFilter filter = new IntentFilter(SmsReceiver.ACTION_MESSAGE_RECEIVED);
+        ContextCompat.registerReceiver(this, messageReceivedReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(messageReceivedReceiver);
     }
 
     private void loadContactAndMessages() {
@@ -80,7 +106,7 @@ public class ConversationActivity extends BaseActivity {
     }
 
     private void sendMessage() {
-        String body = editMessageBody.getText().toString().trim();
+        String body = editMessageBody.getText().toString();
 
         if (body.isEmpty()) {
             return;
