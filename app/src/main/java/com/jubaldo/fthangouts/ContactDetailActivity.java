@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.jubaldo.fthangouts.db.DBHelper;
 import com.jubaldo.fthangouts.model.Contact;
 
@@ -23,12 +25,7 @@ public class ContactDetailActivity extends BaseActivity {
         contactId = getIntent().getIntExtra(EXTRA_CONTACT_ID, -1);
 
         View buttonDeleteContact = findViewById(R.id.buttonDeleteContact);
-        buttonDeleteContact.setOnClickListener(v -> {
-            try (DBHelper dbHelper = new DBHelper(this)) {
-                dbHelper.deleteContact(contactId);
-            }
-            finish();
-        });
+        buttonDeleteContact.setOnClickListener(v -> confirmDeleteContact());
 
         View buttonEditContact = findViewById(R.id.buttonEditContact);
         buttonEditContact.setOnClickListener(v -> {
@@ -70,5 +67,18 @@ public class ContactDetailActivity extends BaseActivity {
         textDetailPhone.setText(contact.getPhoneNumber());
         textDetailEmail.setText(contact.getEmail());
         textDetailBirthday.setText(contact.getBirthday());
+    }
+
+    private void confirmDeleteContact() {
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.dialog_delete_contact_message)
+                .setPositiveButton(R.string.action_delete, (dialog, which) -> {
+                    try (DBHelper dbHelper = new DBHelper(this)) {
+                        dbHelper.deleteContact(contactId);
+                    }
+                    finish();
+                })
+                .setNegativeButton(R.string.action_cancel, null)
+                .show();
     }
 }
